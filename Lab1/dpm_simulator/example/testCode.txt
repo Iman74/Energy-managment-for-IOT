@@ -1,0 +1,1 @@
+./dpm_simulator -t 20 50 -psm example/psm.txt -wl example/custom_workload_1.txt
