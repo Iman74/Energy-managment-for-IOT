@@ -1,15 +1,15 @@
 clc
 %%
-M= 1;
+M= 5;
 N = size(idleP,2);
 x1= idleP(M,1:N-1);
-x2= activeP(M,1:N-1);
+x2= activeP(1,1:N-1);
 y = idleP(M,2:N);
 
 %% Fit
 [xData, yData, zData] = prepareSurfaceData( x1, x2, y );
 % Set up fittype and options.
-ft = fittype( 'a + b*x   + c*x^2   + d*y^2', 'independent', {'x', 'y'}, 'dependent', 'z' );
+ft = fittype( 'a + b*x   + c*x^2   + d*y + e*y^2', 'independent', {'x', 'y'}, 'dependent', 'z' );
 opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
 opts.Display = 'Off';
 opts.StartPoint = [0.474662969993381 0.187584947206236 0.464466964322128 0.932089536286421];

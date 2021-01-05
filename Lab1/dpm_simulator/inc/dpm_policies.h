@@ -98,6 +98,6 @@ void dpm_init_history(psm_time_t *h);
  * @param new_idle: the new idle interval to be inserted
  *
  */
-void dpm_update_history(psm_time_t *h, psm_time_t new_idle);
+void dpm_update_history(psm_time_t *h, psm_time_t new_idle, psm_time_t new_active);
 
 #endif

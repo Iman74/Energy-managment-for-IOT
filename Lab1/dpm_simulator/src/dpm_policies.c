@@ -33,7 +33,7 @@ int dpm_simulate(psm_t psm, dpm_policy_t sel_policy, dpm_timeout_params
 
 		active_period.end = idle_period.start;
         t_idle_ideal += psm_duration(idle_period);
-		dpm_update_history(history, psm_duration(idle_period),psm_duration(idle_period));
+		dpm_update_history(history, psm_duration(idle_period),psm_duration(active_period));
 		active_period.start = idle_period.end;
         /*printf("idle: %lf %lf\n", idle_period.start, idle_period.end);*/
 
@@ -119,9 +119,29 @@ int dpm_decide_state(psm_state_t *next_state, psm_time_t curr_time,
             } else {
                 *next_state = PSM_STATE_ACTIVE;
                 /* LAB 3 EDIT */
-                hparams.alpha[i] * history[i] ....
-                //if(value_prediction ...)
-                //    *next_state = PSM_STATE_ACTIVE; ...
+				/*
+				   a =       46.61  (43.31, 49.92)
+				   b =      0.1357  (0.0247, 0.2466)
+				   c =   -0.001201  (-0.002274, -0.0001294)
+				   d =    0.007415  (-0.01493, 0.02976)
+				   e =  -1.574e-05  (-5.887e-05, 2.739e-05)
+				*/
+				//./dpm_simulator -h 46.61 0.1357 -0.001201 0.007415 -1.574e-05 10 100 -psm example/psm_new.txt -wl example/Generated_workload_1.1.txt
+
+				//Tidle[i]= K0+ K1·Tidle[i-1]+ K2·Tidle[i-1]^2 + K3·Tactive[i]+ K4·Tactive[i]^2
+				double value_prediction = 	hparams.alpha[0]+ 
+									hparams.alpha[1] * history[DPM_HIST_WIND_SIZE-1] + 
+									hparams.alpha[2] * history[DPM_HIST_WIND_SIZE-1] * history[DPM_HIST_WIND_SIZE-1] + 
+									hparams.alpha[3] * history[2*DPM_HIST_WIND_SIZE-1] + 
+									hparams.alpha[4] * history[2*DPM_HIST_WIND_SIZE-1] * history[2*DPM_HIST_WIND_SIZE-1];
+				//printf("%f\n", value_prediction);
+				if(value_prediction < hparams.threshold[0]) {
+					*next_state = PSM_STATE_ACTIVE;
+				} else if(value_prediction > hparams.threshold[1] && hparams.threshold[1] >= hparams.threshold[0] ) {
+					*next_state = PSM_STATE_SLEEP;
+				} else {
+					*next_state = PSM_STATE_IDLE;	
+				}
             }
             break;
 
@@ -141,7 +161,7 @@ void dpm_init_history(psm_time_t *h)
 }
 
 /* update idle time history */
-void dpm_update_history(psm_time_t *h, psm_time_t new_idle,, psm_time_t new_active)
+void dpm_update_history(psm_time_t *h, psm_time_t new_idle, psm_time_t new_active)
 {
 	for (int i=0; i<DPM_HIST_WIND_SIZE-1; i++){
 		h[i] = h[i+1];
@@ -150,5 +170,5 @@ void dpm_update_history(psm_time_t *h, psm_time_t new_idle,, psm_time_t new_acti
 	for (int i=DPM_HIST_WIND_SIZE; i<2*DPM_HIST_WIND_SIZE-1; i++){
 		h[i] = h[i+1];
 	}
-	h[DPM_HIST_WIND_SIZE-1] = new_active;
+	h[2*DPM_HIST_WIND_SIZE-1] = new_active;
 }

@@ -35,6 +35,7 @@ int parse_args(int argc, char *argv[], char *fwl, psm_t *psm, dpm_policy_t
 				for(i = 0; i < DPM_N_THRESHOLDS; i++) {
                     hparams->threshold[i] = atof(argv[++cur]);
                 }
+				//printf("%f,%f,%f,%f,%f\t%f,%f\n",hparams->alpha[0],hparams->alpha[1],hparams->alpha[2],hparams->alpha[3],hparams->alpha[4],hparams->threshold[0],hparams->threshold[1]);
             } else return 0;
         }
 
