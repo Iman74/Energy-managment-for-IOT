@@ -26,7 +26,7 @@
  *
  */
 int parse_args(int argc, char *argv[], char *fwl, psm_t *psm, dpm_policy_t
-        *selected_policy, dpm_timeout_params *tparams, dpm_history_params *hparams);
+        *selected_policy, dpm_timeout_params *tparams, dpm_history_params *hparams, char *res_name);
 
 /**
  * @brief Print a message explaining command line parameters of the simulator

@@ -7,7 +7,7 @@
 #define _INCLUDE_DPM_POLICIES_H
 
 #include "inc/psm.h"
-
+#include <string.h>
 /**
  * @defgroup dpm_params Parameters of DPM policies
  * @{
@@ -29,6 +29,10 @@
 /** history-based policy */
 #define DPM_HISTORY 1
 /** @} */
+//#define PRINT
+#define PRINTTOFILE
+#define PRINTTOFILE_DELIMITER "~"
+
 
 /** Type alias for DPM policy IDs */
 typedef int dpm_policy_t;
@@ -62,7 +66,7 @@ typedef struct {
  *
  */
 int dpm_simulate(psm_t psm, dpm_policy_t sel_policy, dpm_timeout_params
-        tparams, dpm_history_params hparams, char* fwl);
+        tparams, dpm_history_params hparams, char* fwl,char *res_address);
 
 /**
  * @brief Decide the next PSM state according to a given DPM policy

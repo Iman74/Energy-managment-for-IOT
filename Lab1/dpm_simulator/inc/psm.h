@@ -37,6 +37,7 @@
 /** sleep state */
 #define PSM_STATE_SLEEP  2
 /** @} */
+#define MAX_FILENAME 256
 
 /**
  * @defgroup psm_type PSM type aliases

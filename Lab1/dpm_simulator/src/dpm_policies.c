@@ -1,7 +1,7 @@
 #include "inc/dpm_policies.h"
 
 int dpm_simulate(psm_t psm, dpm_policy_t sel_policy, dpm_timeout_params
-		tparams, dpm_history_params hparams, char* fwl)
+		tparams, dpm_history_params hparams, char* fwl,char *res_address)
 {
 
 	FILE *fp;
@@ -74,23 +74,64 @@ int dpm_simulate(psm_t psm, dpm_policy_t sel_policy, dpm_timeout_params
         }
     }
     fclose(fp);
+	#ifdef PRINT
+		printf("[sim] Active time in profile = %.6lfs \n", (curr_time - t_idle_ideal) * PSM_TIME_UNIT);
+		printf("[sim] Idle time in profile = %.6lfs\n", t_idle_ideal * PSM_TIME_UNIT);
+		printf("[sim] Total time = %.6lfs\n", curr_time * PSM_TIME_UNIT);
+		printf("[sim] Timeout waiting time = %.6lfs\n", t_waiting * PSM_TIME_UNIT);
+		for(int i = 0; i < PSM_N_STATES; i++) {
+			printf("[sim] Total time in state %s = %.6lfs\n", PSM_STATE_NAME(i),
+					t_state[i] * PSM_TIME_UNIT);
+		}
+		printf("[sim] Time overhead for transition = %.6lfs\n",t_tran_total * PSM_TIME_UNIT);
+		printf("[sim] N. of transitions = %d\n", n_tran_total);
+		printf("[sim] Energy for transitions = %.6fJ\n", e_tran_total * PSM_ENERGY_UNIT);
+		printf("[sim] Energy w/o DPM = %.6fJ, Energy w DPM = %.6fJ\n",
+				e_total_no_dpm * PSM_ENERGY_UNIT, e_total * PSM_ENERGY_UNIT);
+		printf("[sim] %2.1f percent of energy saved.\n", 100*(e_total_no_dpm - e_total) /
+				e_total_no_dpm);
+				
+	#endif		
+	//////////////////////////////////////////////////////save resukt in file	
+	#ifdef PRINTTOFILE
+		/* File pointer to hold reference to our file */
+		
+		//char res_address[2*MAX_FILENAME] = "example/Rdata/";
+		//strcat (res_address,arg);
+		//strcat (res_address,"_result.txt");
+		FILE * fPtr;
+		// Open file in w (write) mode. 
+		fPtr = fopen(res_address, "w");
+		/* fopen() return NULL if last operation was unsuccessful */
+		if(fPtr == NULL)
+		{
+			/* File not created hence exit */
+			printf("Unable to create \"%s\".\n",res_address);
+			return 0;
+		}else {
+		/*save in file*/
+			fprintf(fPtr,"%.6lf\n", (curr_time - t_idle_ideal) * PSM_TIME_UNIT);
+			fprintf(fPtr,"%.6lf\n", t_idle_ideal * PSM_TIME_UNIT);
+			fprintf(fPtr,"%.6lf\n", curr_time * PSM_TIME_UNIT);
+			fprintf(fPtr,"%.6lf\n", t_waiting * PSM_TIME_UNIT);
+			for(int i = 0; i < PSM_N_STATES; i++) {
+				//fprintf(fPtr,"%s = %.6lfs\n", PSM_STATE_NAME(i),t_state[i] * PSM_TIME_UNIT);
+				fprintf(fPtr,"%.6lf\n", t_state[i] * PSM_TIME_UNIT);
 
-    printf("[sim] Active time in profile = %.6lfs \n", (curr_time - t_idle_ideal) * PSM_TIME_UNIT);
-    printf("[sim] Idle time in profile = %.6lfs\n", t_idle_ideal * PSM_TIME_UNIT);
-    printf("[sim] Total time = %.6lfs\n", curr_time * PSM_TIME_UNIT);
-    printf("[sim] Timeout waiting time = %.6lfs\n", t_waiting * PSM_TIME_UNIT);
-    for(int i = 0; i < PSM_N_STATES; i++) {
-        printf("[sim] Total time in state %s = %.6lfs\n", PSM_STATE_NAME(i),
-                t_state[i] * PSM_TIME_UNIT);
-    }
-    printf("[sim] Time overhead for transition = %.6lfs\n",t_tran_total * PSM_TIME_UNIT);
-    printf("[sim] N. of transitions = %d\n", n_tran_total);
-    printf("[sim] Energy for transitions = %.6fJ\n", e_tran_total * PSM_ENERGY_UNIT);
-    printf("[sim] Energy w/o DPM = %.6fJ, Energy w DPM = %.6fJ\n",
-            e_total_no_dpm * PSM_ENERGY_UNIT, e_total * PSM_ENERGY_UNIT);
-    printf("[sim] %2.1f percent of energy saved.\n", 100*(e_total_no_dpm - e_total) /
-            e_total_no_dpm);
+			}
+			fprintf(fPtr,"%.6lf\n",t_tran_total * PSM_TIME_UNIT);
+			fprintf(fPtr,"%d\n", n_tran_total);
+			fprintf(fPtr,"%.6f\n", e_tran_total * PSM_ENERGY_UNIT);
+			fprintf(fPtr,"%.6f\n%.6f\n",
+					e_total_no_dpm * PSM_ENERGY_UNIT, e_total * PSM_ENERGY_UNIT);
+			fprintf(fPtr,"%2.1f \n", 100*(e_total_no_dpm - e_total) /
+					e_total_no_dpm);
 
+			/* Close file to save file data */
+			fclose(fPtr);	
+			printf("%s has saved!\n",res_address);
+		}
+	#endif
 	return 1;
 }
 
