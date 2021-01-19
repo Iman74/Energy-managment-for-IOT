@@ -5,7 +5,11 @@ clear
 %make random Lengths
 s = rng;
 % Uniform distribution, min = 1us, max = 500us, 5000 samples!
-activeP = randi([1 500],1,5000);
+activeP(1,:) = randi([1 500],1,5000);
+activeP(2,:) = randi([1 500],1,5000);
+activeP(3,:) = randi([1 500],1,5000);
+activeP(4,:) = randi([1 500],1,5000);
+activeP(5,:) = randi([1 500],1,5000);
 %Uniform distribution, min = 1us, max=100us (high utilization)
 idleP(1,:) = randi([1 100],1,5000); 
 %Uniform distribution, min=1us, max=400us (low utilization)
@@ -17,7 +21,7 @@ idleP(4,:) = ceil(random('Exponential',50,1,5000));
 %Tri-modal distribution – Mean = 50, 100, 150us – Standard deviation=10
 for i = 1:5000
    rnd = unidrnd(3,1);
-   idleP(5,i) = random('Normal',rnd*50,10);
+   idleP(5,i) = ceil(random('Normal',rnd*50,10));
 end
 %idleP(6,:) = [round(random('Normal',50,10,1,1666)) round(random('Normal',100,10,1,1668)) round(random('Normal',150,10,1,1666))]; 
 

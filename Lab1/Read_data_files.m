@@ -42,7 +42,7 @@ while(1)
                     fileContents = [fileContents,[str2double(fileDetail(2));str2double(fileDetail(3));fscanf(fileID,'%f')]];
                     fclose(fileID);
                     %delete file
-                    %recycle on; % Send deleted files to recycle bin
+                    recycle off; % Send deleted files to recycle bin
                     delete(fullFileName);
                 else
                     disp("File does not exist!");
@@ -57,8 +57,8 @@ while(1)
     sFileName = char(strcat("dpm_simulator/example/Mdata/" ,sFileName + ".mat"))
     sortedFileContents = sortrows(fileContents',[1,2]);
     %plot
-    %figure('Name',sFileName);
-    %plot(sortedFileContents(:,1),sortedFileContents(:,15));
+    figure('Name',sFileName);
+    plot(sortedFileContents(:,1),sortedFileContents(:,15));
 
     save (sFileName,'sortedFileContents' );
     %clear data sets

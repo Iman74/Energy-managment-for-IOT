@@ -7,9 +7,9 @@ func = "./dpm_simulator";
 %
 time = " -t";
 idle_t = 0; %us
-idle_t_step = 5;
+idle_t_step = 3;
 sleep_t = 0; %us
-sleep_t_step = 5;
+sleep_t_step = 6;
 
 %
 history = " -h";
@@ -40,7 +40,7 @@ wl_idx = 0;
 
 %%
 %make file
-fileID = fopen('dpm_simulator/T_Run.bash','w');
+fileID = fopen('dpm_simulator/H_Run.bash','w');
 
 % disp("timeout policy");
 % disp("#1 only idle");
@@ -53,17 +53,37 @@ fileID = fopen('dpm_simulator/T_Run.bash','w');
 %     end
 % end
 
-disp("#1 idle and sleep");
+% disp("#2 idle and sleep");
+% psm_idx = 1;
+% for wl_idx = 1:size(wl_name,2)
+%     disp(wl_idx);
+%     for idle_t = wl_min_max(wl_idx,1):idle_t_step:wl_min_max(wl_idx,2)
+%         for sleep_t = idle_t+1:sleep_t_step:wl_min_max(wl_idx,2)
+%             fprintf(fileID,func + time + " %.5g %.5g"+psm +psm_name(psm_idx)+ wl + wl_name(wl_idx) + " &\n",idle_t , sleep_t);
+%         end
+%     end
+% end
+
+% disp("#3 history");
+%a+ b*x+ c*x^2 + d*y+ e*y^2
+%read Coeff
+fullFileName = "dpm_simulator/example/Coeff_h.2.txt" ;
+fID = fopen(fullFileName,'r');
+data = fscanf(fID,'%f');
+coeff= reshape(data,[],7);
+fclose(fID); 
+%generate history code 1
 psm_idx = 1;
 for wl_idx = 1:size(wl_name,2)
     disp(wl_idx);
+    coeff_h = coeff(:,wl_idx);
     for idle_t = wl_min_max(wl_idx,1):idle_t_step:wl_min_max(wl_idx,2)
         for sleep_t = idle_t+1:sleep_t_step:wl_min_max(wl_idx,2)
-            fprintf(fileID,func + time + " %.5g %.5g"+psm +psm_name(psm_idx)+ wl + wl_name(wl_idx) + " &\n",idle_t , sleep_t);
+            fprintf(fileID,func + history + " %.3e %.3e %.3e %.3e %.3e %.5g %.5g"+psm +psm_name(psm_idx)+ wl + wl_name(wl_idx) + " &\n",...
+                        coeff_h,idle_t , sleep_t);
         end
     end
 end
-
 
 
 

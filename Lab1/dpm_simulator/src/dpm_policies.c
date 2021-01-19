@@ -1,5 +1,7 @@
 #include "inc/dpm_policies.h"
 
+const short H_Model = 1;
+
 int dpm_simulate(psm_t psm, dpm_policy_t sel_policy, dpm_timeout_params
 		tparams, dpm_history_params hparams, char* fwl,char *res_address)
 {
@@ -168,13 +170,21 @@ int dpm_decide_state(psm_state_t *next_state, psm_time_t curr_time,
 				   e =  -1.574e-05  (-5.887e-05, 2.739e-05)
 				*/
 				//./dpm_simulator -h 46.61 0.1357 -0.001201 0.007415 -1.574e-05 10 100 -psm example/psm_new.txt -wl example/Generated_workload_1.1.txt
-
-				//Tidle[i]= K0+ K1·Tidle[i-1]+ K2·Tidle[i-1]^2 + K3·Tactive[i]+ K4·Tactive[i]^2
-				double value_prediction = 	hparams.alpha[0]+ 
-									hparams.alpha[1] * history[DPM_HIST_WIND_SIZE-1] + 
-									hparams.alpha[2] * history[DPM_HIST_WIND_SIZE-1] * history[DPM_HIST_WIND_SIZE-1] + 
-									hparams.alpha[3] * history[2*DPM_HIST_WIND_SIZE-1] + 
-									hparams.alpha[4] * history[2*DPM_HIST_WIND_SIZE-1] * history[2*DPM_HIST_WIND_SIZE-1];
+				if (H_Model == 0){
+					//Tidle[i]= K0+ K1·Tidle[i-1]+ K2·Tidle[i-1]^2 + K3·Tactive[i]+ K4·Tactive[i]^2
+					double value_prediction = 	hparams.alpha[0]+ 
+										hparams.alpha[1] * history[DPM_HIST_WIND_SIZE-1] + 
+										hparams.alpha[2] * history[DPM_HIST_WIND_SIZE-1] * history[DPM_HIST_WIND_SIZE-1] + 
+										hparams.alpha[3] * history[2*DPM_HIST_WIND_SIZE-1] + 
+										hparams.alpha[4] * history[2*DPM_HIST_WIND_SIZE-1] * history[2*DPM_HIST_WIND_SIZE-1];
+				} else if (H_Model == 1) {
+					//Tidle[i]= K0+ K1·Tidle[i-1]+ K2·Tidle[i-1]^4 + K3·Tidle[i-2]+ K4·Tidle[i-2]^5
+					double value_prediction = 	hparams.alpha[0]+ 
+										hparams.alpha[1] * history[DPM_HIST_WIND_SIZE-1] + 
+										hparams.alpha[2] * history[DPM_HIST_WIND_SIZE-1] * history[DPM_HIST_WIND_SIZE-1] * history[DPM_HIST_WIND_SIZE-1] * history[DPM_HIST_WIND_SIZE-1] + 
+										hparams.alpha[3] * history[DPM_HIST_WIND_SIZE-2] + 
+										hparams.alpha[4] * history[DPM_HIST_WIND_SIZE-2] * history[DPM_HIST_WIND_SIZE-2]* history[DPM_HIST_WIND_SIZE-2]* history[DPM_HIST_WIND_SIZE-2]* history[DPM_HIST_WIND_SIZE-2];
+				}
 				//printf("%f\n", value_prediction);
 				if(value_prediction < hparams.threshold[0]) {
 					*next_state = PSM_STATE_ACTIVE;
