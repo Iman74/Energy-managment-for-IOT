@@ -4,7 +4,7 @@ fclose all;
 %%
 fileDetails = {};
 fileContents = [];
-
+i = 1;
 while(1)
     files = dir('dpm_simulator/example/Rdata');
     if (length(files)<=2)
@@ -59,7 +59,7 @@ while(1)
     %plot
     figure('Name',sFileName);
     plot(sortedFileContents(:,1),sortedFileContents(:,15));
-
+    
     save (sFileName,'sortedFileContents' );
     %clear data sets
     fileDetails = {};

@@ -31,6 +31,7 @@ for i =1:length(fullFileNames)
 end
 clearvars -except idle_t active_t
 
+%%
 idleOld2_t = idle_t(:,1:end-2);
 idleOld_t = idle_t(:,2:end-1);
 idle_t = idle_t(:,3:end);
