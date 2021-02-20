@@ -25,7 +25,7 @@ energySavedPercent = sortedFileContents(:,15);
 z(7,:) = {idleTimout, energyOfTrans, energySavedPercent,sleepTimeout};
 clearvars -except z
 %%
-baseAddress = "dpm_simulator/example/Mdata/idle and sleep/Results/";
+baseAddress = "dpm_simulator/example/Mdata/history file method 2/Results/";
 z2=z;
 save (baseAddress+"Res_T_idleTimout",'z2');
 clearvars -except z baseAddress
@@ -80,6 +80,7 @@ saveas(gcf,fname)
 %close all
 %% 3D
 close all
+clc
 figure
 xaxis=2;
 yaxis=4;
@@ -106,7 +107,12 @@ subplot(xaxis,yaxis,7)
     plotwhole(7,z);
     title('7. Idle Tri-modal')
     
-fname = sprintf(baseAddress+ 'Res_T_idlesleepTimout (Energy Overhead)');
+mod = 3; %2 for energy overhead 3 for Energy Saved Percent
+if (mod==2)
+    fname = sprintf(baseAddress+ 'Res_T_idlesleepTimout (Energy Overhead)');
+else
+    fname = sprintf(baseAddress+ 'Res_T_idlesleepTimout (Energy Saved Percent)');
+end
 set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
 saveas(gcf,fname,'png')
 saveas(gcf,fname)
@@ -117,10 +123,10 @@ saveas(gcf,fname)
 clearvars -except sortedFileContents
 close all
 function []=plotwhole (Num,z)
-    %Num = 2;
+    mod = 3; %2 for energy overhead 3 for Energy Saved Percent
     x= (cell2mat(z(Num,1)));
     s= (cell2mat(z(Num,4)));
-    y = (cell2mat(z(Num,2)));
+    y = (cell2mat(z(Num,mod)));
     x_old = x(1);
     index= 1 ;
     i=1;
@@ -135,11 +141,15 @@ function []=plotwhole (Num,z)
         y_l = y(index(i):index(i+1)-1);
         s_l = s(index(i):index(i+1)-1);
         if (~isempty (find(y_l > y_l(end))))
-            i
+            %i
         end
         plot(s_l,y_l);
         xlabel('Sleep Timout')
-        ylabel('Energy Overhead')
+        if (mod==2)
+            ylabel('Energy Overhead')
+        else
+            ylabel('Energy Saved Percent')
+        end
         hold on
     end
     hold off
